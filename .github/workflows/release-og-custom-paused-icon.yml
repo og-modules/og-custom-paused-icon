@@ -85,8 +85,10 @@ jobs:
         with:
           node-version: ${{ env.node_version }}
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Work around npm optionalDependencies bug for Rollup
+        run: |
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
 
       - name: Build the module
         run: npm run build
