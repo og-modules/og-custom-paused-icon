@@ -2,7 +2,7 @@
   "id": "og-custom-paused-icon",
   "title": "Og's Custom Foundry VTT Paused Icon",
   "description": "Change the paused icon to the one from Og's Game Hub.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "templateVersion": 2,
   "minimumCoreVersion": "13",
   "compatibleCoreVersion": "13",

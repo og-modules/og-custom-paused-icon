@@ -1,6 +1,6 @@
-// import ModuleInfo from "./module.json" assert { type: "json" };
+import ModuleInfo from "./module.json" assert { type: "json" };
 
-console.log("og-custom-paused-icon: module loading...");
+console.log("og-custom-paused-icon: module loading...", ModuleInfo);
 
 // //og-custom-paused-icon
 // export class CustomPausedIcon extends og.BaseModule {
