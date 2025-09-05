@@ -26,6 +26,12 @@ export class CustomPausedIcon extends og.BaseModule {
                 this.updateIcon(html[0]);
             }
         );
+        this.hooks.on("pauseGame", (paused: boolean) => {
+            console.debug("og-custom-paused-icon: hooks-pauseGame");
+            if (paused) {
+                this.updateIcon(document);
+            }
+        });
         this.hooks.on("ready", () => {
             console.debug("og-custom-paused-icon: hooks-ready");
             this.updateIcon(document);
