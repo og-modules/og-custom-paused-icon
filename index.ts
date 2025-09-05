@@ -28,5 +28,5 @@ export class CustomPausedIcon extends og.BaseModule {
     }
 }
 
-// // Create an instance of the module and register it with Og Core Library.
-// og.registerModule(() => new CustomPausedIcon(ModuleInfo));
+// Create an instance of the module and register it with Og Core Library.
+og.registerModule(() => new CustomPausedIcon(ModuleInfo));
