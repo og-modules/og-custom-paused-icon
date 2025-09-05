@@ -113,22 +113,35 @@ jobs:
           name: og-custom-paused-icon-dist
           path: ./dist
 
-      - name: Inject manifest/download URLs into module.json
+      - name: Inject manifest/download/version into module.json (stable latest manifest URL)
         shell: bash
         run: |
           set -euo pipefail
           version="${{ needs.set_version.outputs.current }}"
           repo="${{ github.repository }}"
-          manifest_url="https://github.com/${repo}/releases/download/v${version}/module.json"
+          # Use a STABLE manifest URL so Foundry can check for updates
+          manifest_url="https://github.com/${repo}/releases/latest/download/module.json"
           zip_name="og-custom-paused-icon-v${version}.zip"
           download_url="https://github.com/${repo}/releases/download/v${version}/${zip_name}"
           url="https://github.com/${repo}"
 
+          # Update fields and normalize dependency manifest keys
           jq \
             --arg manifest "$manifest_url" \
             --arg download "$download_url" \
             --arg url "$url" \
-            '. + {manifest: $manifest, download: $download, url: $url}' \
+            --arg version "$version" \
+            '
+            .version = $version
+            | .manifest = $manifest
+            | .download = $download
+            | .url = $url
+            | if .relationships and .relationships.requires then
+                .relationships.requires = (.relationships.requires | map(if has("x-manifest") then (.manifest = .["x-manifest"] | del(."x-manifest")) else . end))
+              else
+                .
+              end
+            ' \
             dist/module.json > dist/module.json.tmp
           mv dist/module.json.tmp dist/module.json
 
@@ -150,7 +163,7 @@ jobs:
 
             **Manifest URL:**
             ```
-            https://github.com/${{ github.repository }}/releases/download/v${{ needs.set_version.outputs.current }}/module.json
+            https://github.com/${{ github.repository }}/releases/latest/download/module.json
             ```
 
             **Direct Download:**
