@@ -30,10 +30,10 @@ export class CustomPausedIcon extends og.BaseModule {
         );
 
         // Find the #paused element
-        const pausedElement = document.querySelector("#paused");
+        const pausedElement = document.querySelector("#pause");
         if (!pausedElement) {
             console.warn(
-                "og-custom-paused-icon: #paused element not found, retrying in 1 second"
+                "og-custom-paused-icon: #pause element not found, retrying in 1 second"
             );
             setTimeout(() => this.setupPausedElementObserver(), 1000);
             return;
@@ -47,7 +47,7 @@ export class CustomPausedIcon extends og.BaseModule {
                 // Check for attribute changes (like class, style, or other attributes)
                 if (mutation.type === "attributes") {
                     console.debug(
-                        "og-custom-paused-icon: #paused attribute changed:",
+                        "og-custom-paused-icon: #pause attribute changed:",
                         mutation.attributeName
                     );
                     shouldUpdate = true;
@@ -55,7 +55,7 @@ export class CustomPausedIcon extends og.BaseModule {
                 // Check for child node changes (content being added/removed)
                 else if (mutation.type === "childList") {
                     console.debug(
-                        "og-custom-paused-icon: #paused children changed"
+                        "og-custom-paused-icon: #pause children changed"
                     );
                     shouldUpdate = true;
                 }
@@ -63,13 +63,13 @@ export class CustomPausedIcon extends og.BaseModule {
 
             if (shouldUpdate) {
                 console.debug(
-                    "og-custom-paused-icon: #paused element changed, updating icon"
+                    "og-custom-paused-icon: #pause element changed, updating icon"
                 );
                 this.updateIcon(document);
             }
         });
 
-        // Start observing the #paused element
+        // Start observing the #pause element
         this.observer.observe(pausedElement, {
             attributes: true, // Watch for attribute changes
             childList: true, // Watch for child node changes
@@ -92,7 +92,7 @@ export class CustomPausedIcon extends og.BaseModule {
 
     updateIcon(el: any) {
         console.debug("og-custom-paused-icon: updateIcon");
-        const pauseIcon = el.querySelector("#paused img");
+        const pauseIcon = el.querySelector("#pause img");
         if (pauseIcon) {
             //@ts-ignore
             pauseIcon.src = `modules/${this.id}/og-paused-icon-128x128.webp`;
