@@ -2,16 +2,10 @@ name: Release og-custom-paused-icon Module
 
 on:
   workflow_dispatch:
-    inputs:
-      version_bump:
-        description: "Version bump type"
-        required: true
-        default: "patch"
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 env:
   node_version: 22
@@ -45,68 +39,28 @@ jobs:
           path: "module.json"
           prop_path: "version"
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.node_version }}
-
-      - name: Bump version in module.json
-        id: bump_version
-        run: |
-          # Get current version
-          current_version="${{ steps.version.outputs.prop }}"
-          echo "Current version: $current_version"
-
-          # Parse version components
-          IFS='.' read -r major minor patch <<< "$current_version"
-
-          # Bump version based on input
-          case "${{ github.event.inputs.version_bump }}" in
-              "major")
-                  major=$((major + 1))
-                  minor=0
-                  patch=0
-                  ;;
-              "minor")
-                  minor=$((minor + 1))
-                  patch=0
-                  ;;
-              "patch")
-                  patch=$((patch + 1))
-                  ;;
-          esac
-
-          new_version="${major}.${minor}.${patch}"
-          echo "New version: $new_version"
-
-          # Update module.json
-          npm pkg set version="$new_version"
-
-          # Also update module.json manually to ensure it's updated
-          sed -i "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" module.json
-
-          echo "new_version=$new_version" >> $GITHUB_OUTPUT
-
       - name: Set versions variables
         id: versions
         run: |
           previous="${{ steps.previoustag.outputs.tag || 'v0.0.0' }}"
-          current="${{ steps.bump_version.outputs.new_version }}"
+          current="${{ steps.version.outputs.prop }}"
 
-          # Remove prefix from previous version for comparison
-          previous_clean=$(echo "$previous" | sed 's/v//')
+          # For pull requests, suffix the version so we publish prereleases without touching tags
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
+            sha_short=$(git rev-parse --short "$GITHUB_SHA")
+            current="${current}-${sha_short}"
+          fi
+
+          # Remove leading 'v' from previous tag for comparison
+          previous_clean=$(echo "$previous" | sed 's/^v//')
 
           echo "previous=$previous_clean" >> $GITHUB_OUTPUT
           echo "current=$current" >> $GITHUB_OUTPUT
-          echo "should_release=true" >> $GITHUB_OUTPUT
-
-      - name: Commit version bump
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add module.json package.json
-          git commit -m "Bump version to ${{ steps.bump_version.outputs.new_version }}" || exit 0
-          git push
+          if [ "$previous_clean" != "$current" ]; then
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Output values
         run: |
@@ -166,6 +120,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.set_version.outputs.current }}
+          prerelease: ${{ github.event_name == 'pull_request' }}
           name: og-custom-paused-icon v${{ needs.set_version.outputs.current }}
           body: |
             ## og-custom-paused-icon v${{ needs.set_version.outputs.current }}
