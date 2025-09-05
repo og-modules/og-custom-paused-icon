@@ -7,29 +7,29 @@ export class CustomPausedIcon extends og.BaseModule {
     public override initialize(): void {
         console.debug("og-custom-paused-icon: initializing...");
 
-        var me = this;
-        Hooks.once("ready", async function () {
-            console.debug("og-custom-paused-icon: hooks-ready");
-            me.updateIcon(document);
-        });
-        Hooks.on(
-            "renderPause",
-            async function (pauseLayer: any, html: any, data: any) {
-                console.debug("og-custom-paused-icon: hooks-renderPause");
-                me.updateIcon(html[0]);
-            }
-        );
-        // this.hooks.on(
+        // var me = this;
+        // Hooks.once("ready", async function () {
+        //     console.debug("og-custom-paused-icon: hooks-ready");
+        //     me.updateIcon(document);
+        // });
+        // Hooks.on(
         //     "renderPause",
-        //     (pauseLayer: any, html: any, data: any) => {
+        //     async function (pauseLayer: any, html: any, data: any) {
         //         console.debug("og-custom-paused-icon: hooks-renderPause");
-        //         this.updateIcon(html[0]);
+        //         me.updateIcon(html[0]);
         //     }
         // );
-        // this.hooks.on("ready", () => {
-        //     console.debug("og-custom-paused-icon: hooks-ready");
-        //     this.updateIcon(document);
-        // });
+        this.hooks.on(
+            "renderPause",
+            (pauseLayer: any, html: any, data: any) => {
+                console.debug("og-custom-paused-icon: hooks-renderPause");
+                this.updateIcon(html[0]);
+            }
+        );
+        this.hooks.on("ready", () => {
+            console.debug("og-custom-paused-icon: hooks-ready");
+            this.updateIcon(document);
+        });
         console.debug("og-custom-paused-icon: initialized");
     }
 
