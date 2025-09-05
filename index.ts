@@ -5,15 +5,17 @@ console.log("og-custom-paused-icon: module loading...", ModuleInfo);
 //og-custom-paused-icon
 export class CustomPausedIcon extends og.BaseModule {
     public override initialize(): void {
-        // this.hooks.on(
-        //     "renderPause",
-        //     (pauseLayer: any, html: any, data: any) => {
-        //         this.updateIcon(html[0]);
-        //     }
-        // );
-        // this.hooks.on("ready", () => {
-        //     this.updateIcon(document);
-        // });
+        this.hooks.on(
+            "renderPause",
+            (pauseLayer: any, html: any, data: any) => {
+                console.log("og-custom-paused-icon: hooks-renderPause");
+                this.updateIcon(html[0]);
+            }
+        );
+        this.hooks.on("ready", () => {
+            console.log("og-custom-paused-icon: hooks-ready");
+            this.updateIcon(document);
+        });
         console.log("og-custom-paused-icon: initialized");
     }
 
